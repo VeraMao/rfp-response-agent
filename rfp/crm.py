@@ -28,6 +28,11 @@ def get_pricing(item, role):
     return result
 
 
+def price_items():
+    """The exact item names get_pricing accepts."""
+    return sorted(_load("pricing.json")["items"])
+
+
 def known_price_numbers():
     """Every number in the price list; used by eval to catch invented prices."""
     pricing = _load("pricing.json")

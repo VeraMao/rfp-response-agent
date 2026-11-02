@@ -38,4 +38,5 @@ Read first: `README.md`, `BRIEF.md`, `docs/ROADMAP.md` (the build plan).
 - Plain Python, small functions, a short docstring saying WHAT and a comment saying WHY
   for any non-obvious rule.
 - Keep each step of the pipeline in its own small module once restructured (M1).
-- Do not write DESIGN.md: Vera writes it herself. You may update README.md and docs/.
+- DESIGN.md was drafted at Vera's request (2026-11-02); she owns it. Change it only when she asks.
+  You may update README.md and docs/.

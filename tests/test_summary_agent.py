@@ -1,10 +1,11 @@
-"""Summary agent loop with a fake model (no API): bad tool arguments, and the untrusted-input rule."""
+"""Summary agent loop with a fake model (no API): bad tool arguments, counts by code, the untrusted-input rule."""
 import json
 import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from rfp import assess, extract, llm, summary_agent
+from rfp import assess, crm, extract, llm, summary_agent
+from tests.helpers import result
 
 USER = {"id": "dana", "name": "Dana Lee", "role": "sales_rep"}
 
@@ -30,15 +31,15 @@ def final(text):
 
 
 class SummaryAgentTests(unittest.TestCase):
-    def run_agent(self, replies):
+    def run_agent(self, replies, rows=()):
         fake = FakeResponses(replies)
         with mock.patch.object(llm, "client", lambda: SimpleNamespace(responses=fake)):
-            summary, calls = summary_agent.run("RFP header", "Meridian Health", [], USER, log=lambda *_: None)
+            summary, calls = summary_agent.run("RFP header", "Meridian Health", list(rows), USER, log=lambda *_: None)
         return summary, calls, fake
 
     def test_malformed_tool_arguments_go_back_to_the_model_as_an_error(self):
         summary, calls, fake = self.run_agent([tool_call("get_customer", "{not json"), final("Done.")])
-        self.assertEqual(summary, "Done.")
+        self.assertTrue(summary.endswith("Done."))
         outputs = [i for i in fake.inputs[1] if isinstance(i, dict) and i.get("type") == "function_call_output"]
         self.assertEqual(outputs[0]["call_id"], "c1")
         self.assertIn("Bad arguments", json.loads(outputs[0]["output"])["error"])
@@ -49,6 +50,19 @@ class SummaryAgentTests(unittest.TestCase):
         summary, calls, _ = self.run_agent(replies)
         self.assertIn("step limit", summary)
         self.assertEqual(len(calls), summary_agent.MAX_STEPS)
+
+
+    def test_counts_come_from_the_code_not_the_model(self):
+        rows = [{"id": "1", "text": "x", **result(status=s)} for s in ("supported", "conditional", "conditional")]
+        summary, _, _ = self.run_agent([final("### Bottom line\nTwo are supported.\n### What it takes to win\n...")],
+                                       rows)
+        self.assertIn("### Bottom line\n**3 requirements: 1 supported, 2 conditional, 0 not supported, "
+                      "0 need review.**", summary)
+
+    def test_price_tool_accepts_only_items_in_the_price_list(self):
+        get_pricing = next(t for t in summary_agent.TOOLS if t["name"] == "get_pricing")
+        self.assertEqual(get_pricing["parameters"]["properties"]["item"]["enum"], crm.price_items())
+        self.assertIn("Enterprise", crm.price_items())
 
 
 class PromptTests(unittest.TestCase):

@@ -14,6 +14,11 @@ RFPS = sorted(p.stem for p in config.RFPS.glob("*.txt"))
 CHUNKS = {c["id"]: c for c in knowledge.load_chunks()}
 
 
+def md(text):
+    """Escape '$' so Streamlit shows prices instead of reading "$55 ... $10" as a math formula."""
+    return text.replace("$", "\\$")
+
+
 @st.cache_resource
 def index():
     return pipeline.build_index()          # embeddings are computed once per session (and cached on disk)
@@ -53,7 +58,7 @@ if result["hidden"]:
     st.caption(f"🔒 {result['hidden']} document sections were hidden by {user['name']}'s permissions.")
 if result["summary"]:
     with st.expander("Deal summary (internal)", expanded=True):
-        st.markdown(result["summary"])
+        st.markdown(md(result["summary"]))
         st.caption(f"Looked up by the agent: {', '.join(result['calls']) or 'nothing'}")
 
 
@@ -78,12 +83,12 @@ st.subheader("Requirements")
 for r in sorted(rows, key=lambda r: draft.ORDER[r["status"]]):
     rid = r["id"]
     with st.container(border=True):
-        st.markdown(f"**{rid}** · {draft.ICON[r['status']]}  \n{r['text']}")
+        st.markdown(f"**{rid}** · {draft.ICON[r['status']]}  \n{md(r['text'])}")
         st.text_area("Answer to the customer", r["answer"], key=f"ans_{rid}", height=90)
         if r["conditions"]:
-            st.markdown(f"**Conditions (internal):** {r['conditions']}")
+            st.markdown(f"**Conditions (internal):** {md(r['conditions'])}")
         if r.get("conflict"):
-            st.warning(f"⚡ Conflicting sources: {r['conflict']}")
+            st.warning(f"⚡ Conflicting sources: {md(r['conflict'])}")
         if r.get("reused_from"):
             st.caption(f"♻️ Reused approved answer {r['reused_from']}")
         if r.get("library_note"):

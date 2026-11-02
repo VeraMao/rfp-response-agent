@@ -6,7 +6,7 @@ up next depends on the results, so this part is an agent. Its tools are read-onl
 """
 import json
 
-from rfp import config, crm, llm
+from rfp import config, crm, draft, llm
 
 MAX_STEPS = 5
 
@@ -17,9 +17,9 @@ TOOLS = [
      "parameters": {"type": "object", "properties": {"name": {"type": "string", "description": "Exact account name"}},
                     "required": ["name"]}},
     {"type": "function", "name": "get_pricing",
-     "description": "Get list pricing for a plan or service (Standard, Enterprise, Fast-track), plus the "
-                    "maximum discount the current user may offer.",
-     "parameters": {"type": "object", "properties": {"item": {"type": "string"}}, "required": ["item"]}},
+     "description": "Get list pricing for a plan or service, plus the maximum discount the current user may offer.",
+     "parameters": {"type": "object", "properties": {"item": {"type": "string", "enum": crm.price_items()}},
+                    "required": ["item"]}},                     # exact names from the price list, never hard-coded
 ]
 
 INSTRUCTIONS = """You write a short deal summary for a sales rep who must decide how to respond to an RFP.
@@ -28,7 +28,7 @@ answer depends on the customer's current situation or on price; don't call tools
 
 Write exactly three sections, in markdown:
 ### Bottom line
-How many requirements are supported, conditional, not supported, or still unknown, and whether we can respond.
+Whether we can respond, and the biggest blockers. Do not count the requirements: the code adds the counts.
 ### What it takes to win
 Plan changes, costs and customer obligations needed to meet the conditional requirements.
 ### Customer context and open risks
@@ -42,6 +42,17 @@ Rules:
 - Mark each fact's source in brackets: [Assessment 3.2], [CRM], [Pricing].
 - Internal note for our team, not text for the customer. Under 250 words.
 - """ + llm.UNTRUSTED_INPUT_RULE
+
+
+def add_counts(summary, rows):
+    """Put the requirement counts under 'Bottom line'. Counted by code, because the model miscounts."""
+    n = draft.counts(rows)
+    line = (f"**{len(rows)} requirements: {n['supported']} supported, {n['conditional']} conditional, "
+            f"{n['not_supported']} not supported, {n['not_found']} need review.**")
+    heading = "### Bottom line"
+    if heading in summary:
+        return summary.replace(heading, f"{heading}\n{line}\n", 1)
+    return f"{line}\n\n{summary}"
 
 
 def run(rfp_header, customer, rows, user, log=print):
@@ -59,7 +70,7 @@ def run(rfp_header, customer, rows, user, log=print):
                                              tools=TOOLS, temperature=0)
         calls = [o for o in resp.output if o.type == "function_call"]
         if not calls:
-            return resp.output_text, calls_made
+            return add_counts(resp.output_text, rows), calls_made
         items += resp.output
         for c in calls:
             func = registry.get(c.name)
