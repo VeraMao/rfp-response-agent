@@ -45,11 +45,16 @@ def propose_update(customer, rows):
 
 
 def write_update(update, approver):
-    """Only called after a human approved. Writes to a file that stands in for the CRM."""
+    """Only called after a human approved. Writes to a file that stands in for the CRM.
+    Returns (file, written). An update identical to one already written is skipped, so a double
+    click or a re-run never creates a duplicate record in the system of record."""
     log_file = config.OUTPUTS / "crm_updates.json"
     entries = json.loads(log_file.read_text()) if log_file.is_file() else []
+    if any({k: e.get(k) for k in update} == update for e in entries):
+        audit.log("crm_write_skipped_duplicate", approver, account=update["account"])
+        return log_file, False
     entries.append({**update, "approved_by": approver})
     config.OUTPUTS.mkdir(exist_ok=True)
     log_file.write_text(json.dumps(entries, indent=2) + "\n")
     audit.log("crm_write", approver, account=update["account"])
-    return log_file
+    return log_file, True

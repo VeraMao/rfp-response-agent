@@ -58,15 +58,19 @@ if result["summary"]:
 
 
 def decide(rid, row):
-    """Called when a reviewer changes a decision: log it, and save approvals to the answer library."""
+    """Called when a reviewer changes a decision: log it, and keep the answer library in step with it.
+    Only the latest decision counts: Reject or Pending withdraws an earlier approval."""
     choice = st.session_state[f"dec_{rid}"]
     answer = st.session_state[f"ans_{rid}"]
     decisions[rid] = choice
     edited = answer != row["answer"]
     audit.log(f"decision_{choice.lower()}", user["name"], rfp=result["rfp"], requirement=rid, edited=edited)
+    source = f"{result['rfp']}:{rid}"
     if choice == "Approve":
-        entry = library.add({**row, "answer": answer}, user["name"])
+        entry = library.add({**row, "answer": answer}, user["name"], source)
         st.toast(f"{rid} approved and saved to the answer library as {entry['id']}.")
+    elif library.remove(source):
+        st.toast(f"{rid}: approval withdrawn and removed from the answer library.")
 
 
 # --- One card per requirement, riskiest first ----------------------------------------
@@ -113,5 +117,8 @@ update = crm.propose_update(result["customer"], rows)
 st.code(json.dumps(update, indent=2), language="json")
 confirm = st.checkbox("I have reviewed this update")
 if st.button("Write to CRM", disabled=not confirm):
-    path = crm.write_update(update, user["name"])
-    st.success(f"Written to {path.name} (simulated CRM).")
+    path, written = crm.write_update(update, user["name"])
+    if written:
+        st.success(f"Written to {path.name} (simulated CRM).")
+    else:
+        st.info("This exact update is already in the CRM. Nothing was written again.")

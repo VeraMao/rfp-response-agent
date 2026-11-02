@@ -18,14 +18,28 @@ def load():
     return json.loads(f.read_text()) if f.is_file() else []
 
 
-def add(row, approver, today=None):
-    entries = load()
-    entry = {"id": f"L-{len(entries) + 1:03d}", "requirement": row["text"], "status": row["status"],
+def _save(entries):
+    _file().write_text(json.dumps(entries, indent=2) + "\n")
+
+
+def add(row, approver, source, today=None):
+    """Save an approved answer. `source` (e.g. 'harbor_bank:R-04') identifies where it was approved:
+    approving the same requirement again replaces its entry instead of adding a duplicate."""
+    entries = [e for e in load() if e.get("source") != source]
+    next_num = max((int(e["id"].split("-")[1]) for e in load()), default=0) + 1   # ids are never reused
+    entry = {"id": f"L-{next_num:03d}", "source": source, "requirement": row["text"], "status": row["status"],
              "answer": row["answer"], "conditions": row["conditions"], "citations": row["citations"],
              "approved_by": approver, "approved_on": (today or date.today()).isoformat()}
-    entries.append(entry)
-    _file().write_text(json.dumps(entries, indent=2) + "\n")
+    _save(entries + [entry])
     return entry
+
+
+def remove(source):
+    """Withdraw an approval (the reviewer changed their mind). Returns True if an entry was removed."""
+    entries = load()
+    kept = [e for e in entries if e.get("source") != source]
+    _save(kept)
+    return len(kept) < len(entries)
 
 
 def find(requirement_text, entries, embed_fn):

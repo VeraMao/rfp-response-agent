@@ -1,5 +1,7 @@
 import json
+import tempfile
 import unittest
+from pathlib import Path
 
 from rfp import config, crm, knowledge, scoring
 
@@ -40,6 +42,19 @@ class CrmTests(unittest.TestCase):
         self.assertEqual(crm.get_pricing("Enterprise", "sales_rep")["your_max_discount_pct"], 10)
         self.assertEqual(crm.get_pricing("Enterprise", "sales_manager")["your_max_discount_pct"], 25)
         self.assertNotIn("your_max_discount_pct", crm.get_pricing("Enterprise", "legal"))
+
+    def test_identical_crm_write_is_not_repeated(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            old, config.OUTPUTS = config.OUTPUTS, Path(tmp)
+            try:
+                update = {"account": "Meridian Health", "activity": "RFP draft prepared", "date": "2026-11-01",
+                          "summary": "1 supported", "open_items": ["3.2 -> Product"]}
+                self.assertTrue(crm.write_update(update, "Dana Lee")[1])
+                self.assertFalse(crm.write_update(dict(update), "Marco Ruiz")[1])     # double click / re-run
+                self.assertTrue(crm.write_update({**update, "summary": "2 supported"}, "Dana Lee")[1])
+                self.assertEqual(len(json.loads((Path(tmp) / "crm_updates.json").read_text())), 2)
+            finally:
+                config.OUTPUTS = old
 
     def test_unknown_items_are_errors_not_exceptions(self):
         self.assertIn("error", crm.get_pricing("Platinum", "sales_rep"))

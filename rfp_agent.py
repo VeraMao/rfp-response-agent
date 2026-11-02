@@ -19,12 +19,12 @@ def ask(question):
         return ""
 
 
-def review(rows, user):
+def review(rfp_name, rows, user):
     """Human review in the terminal: approved answers go to the answer library."""
     for r in rows:
         print(f"\n{r['id']} [{r['status']}] {r['text']}\n  Answer: {r['answer']}\n  Conditions: {r['conditions']}")
         if ask("  Approve this answer? (yes/no): ") == "yes":
-            entry = library.add(r, user["name"])
+            entry = library.add(r, user["name"], f"{rfp_name}:{r['id']}")
             audit.log("approve_answer", user["name"], requirement=r["id"], library_id=entry["id"])
             print(f"  Saved to the answer library as {entry['id']}.")
 
@@ -45,13 +45,15 @@ def main():
     print(f"\nDraft written to {out}")
 
     if args.review:
-        review(rows, user)
+        review(args.rfp, rows, user)
 
     # Step 7: a WRITE. Code proposes it, a human approves it, then code writes it.
     update = crm.propose_update(result["customer"], rows)
     print("\nProposed CRM update (WRITE):\n" + json.dumps(update, indent=2))
     if ask("Write this to the CRM? Type 'yes' to approve: ") == "yes":
-        print(f"Written to {crm.write_update(update, user['name'])} (simulated CRM).")
+        path, written = crm.write_update(update, user["name"])
+        print(f"Written to {path} (simulated CRM)." if written
+              else "This exact update is already in the CRM. Nothing was written again.")
     else:
         print("Not written. Nothing was changed in the CRM.")
 
