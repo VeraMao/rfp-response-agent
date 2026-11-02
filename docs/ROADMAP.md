@@ -1,8 +1,8 @@
 # Roadmap: from steel thread to a realistic prototype
 
-**Status (Nov 2): all milestones below are built and committed. 50 offline tests pass; the eval
+**Status (Nov 2): all milestones below are built and committed. 53 offline tests pass; the eval
 scores 30/30 on retrieval recall and 30/30 on answer checks (see docs/EVAL_RESULTS.md).
-This file is kept as the original build plan; for the current design see README.md and DESIGN.md.**
+This file is kept as the original build plan; for the current design see README.md.**
 
 Work through the milestones in order. Each milestone ends with: pytest green, eval score
 reported, README updated, one git commit with the score in the message.
@@ -74,4 +74,3 @@ reported, README updated, one git commit with the score in the message.
 ## M6 - Polish for the presentation (1 h)
 - README: architecture diagram, how to run the UI, eval results table per milestone.
 - `docs/EVAL_RESULTS.md`: scores after each milestone (the story of improvement).
-- Leave DESIGN.md to Vera.

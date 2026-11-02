@@ -38,3 +38,12 @@ def build(customer, rows, user, summary=None, calls_made=(), hidden=0):
             lines.append(f"- **Confirm with:** {r['owner']}")
         lines.append("")
     return "\n".join(lines)
+
+
+def export(customer, rows, approved):
+    """The customer file, built only from the exact text each answer had when it was approved.
+    None until every answer is approved. Conditions and internal notes are never included."""
+    if any(r["id"] not in approved for r in rows):
+        return None
+    return "\n\n".join([f"# Response to {customer}"] +
+                        [f"**{r['id']}** {r['text']}\n\n{approved[r['id']]}" for r in rows])

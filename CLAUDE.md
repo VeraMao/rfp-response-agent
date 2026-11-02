@@ -6,7 +6,7 @@ where every answer is backed by a citation to an internal company document.
 Built as an interview case study by Vera (Jiaming) Mao. She must be able to explain
 every file in an interview, so **simple, readable code beats clever code.**
 
-Read first: `README.md`, `BRIEF.md`, `docs/ROADMAP.md` (the build plan).
+Read first: `README.md`, `docs/ROADMAP.md` (the build plan).
 
 ## Commands
 ```bash
@@ -38,5 +38,5 @@ Read first: `README.md`, `BRIEF.md`, `docs/ROADMAP.md` (the build plan).
 - Plain Python, small functions, a short docstring saying WHAT and a comment saying WHY
   for any non-obvious rule.
 - Keep each step of the pipeline in its own small module once restructured (M1).
-- DESIGN.md was drafted at Vera's request (2026-11-02); she owns it. Change it only when she asks.
+- Vera keeps DESIGN.md and NOTES.md outside the repo; change them only when she asks.
   You may update README.md and docs/.

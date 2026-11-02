@@ -37,7 +37,7 @@ with st.sidebar:
             del st.session_state[key]                       # a new run starts with fresh answers
         with st.spinner("Reading the RFP, searching documents, assessing each requirement..."):
             st.session_state.result = pipeline.run(rfp_name, user_id, index=index(), log=lambda *_: None)
-            st.session_state.decisions = {}
+            st.session_state.approved = {}             # requirement id -> the exact text approved
         audit.log("run", USERS[user_id]["name"], rfp=rfp_name)
     st.caption("Nothing is sent to the customer. The CRM is only updated after you confirm.")
 
@@ -49,7 +49,7 @@ if not result:
 if result["rfp"] != rfp_name or result["user"]["id"] != user_id:
     st.warning(f"Showing results for **{result['rfp']}** as **{result['user']['name']}**. Click Run agent to refresh.")
 
-user, rows, decisions = result["user"], result["rows"], st.session_state.decisions
+user, rows, approved = result["user"], result["rows"], st.session_state.approved
 
 # --- Overview ------------------------------------------------------------------------
 st.title(f"{result['customer']}: draft RFP response")
@@ -70,15 +70,27 @@ def decide(rid, row):
     Only the latest decision counts: Reject or Pending withdraws an earlier approval."""
     choice = st.session_state[f"dec_{rid}"]
     answer = st.session_state[f"ans_{rid}"]
-    decisions[rid] = choice
     edited = answer != row["answer"]
     audit.log(f"decision_{choice.lower()}", user["name"], rfp=result["rfp"], requirement=rid, edited=edited)
     source = f"{result['rfp']}:{rid}"
     if choice == "Approve":
+        approved[rid] = answer
         entry = library.add({**row, "answer": answer}, user["name"], source)
         st.toast(f"{rid} approved and saved to the answer library as {entry['id']}.")
-    elif library.remove(source):
-        st.toast(f"{rid}: approval withdrawn and removed from the answer library.")
+    else:
+        approved.pop(rid, None)
+        if library.remove(source):
+            st.toast(f"{rid}: approval withdrawn and removed from the answer library.")
+
+
+def edit(rid):
+    """Called when an answer is edited. An approval covers one exact text, so editing it resets the approval."""
+    if rid in approved and st.session_state[f"ans_{rid}"] != approved[rid]:
+        del approved[rid]
+        st.session_state[f"dec_{rid}"] = "Pending"
+        library.remove(f"{result['rfp']}:{rid}")
+        audit.log("approval_reset_by_edit", user["name"], rfp=result["rfp"], requirement=rid)
+        st.toast(f"{rid} was edited after approval, so it is back to Pending. Approve it again to export it.")
 
 
 # --- One card per requirement, riskiest first ----------------------------------------
@@ -87,7 +99,8 @@ for r in sorted(rows, key=lambda r: draft.ORDER[r["status"]]):
     rid = r["id"]
     with st.container(border=True):
         st.markdown(f"**{rid}** · {draft.ICON[r['status']]}  \n{md(r['text'])}")
-        st.text_area("Answer to the customer", r["answer"], key=f"ans_{rid}", height=90)
+        st.text_area("Answer to the customer", r["answer"], key=f"ans_{rid}", height=90,
+                     on_change=edit, args=(rid,))
         if r["conditions"]:
             st.markdown(f"**Conditions (internal):** {md(r['conditions'])}")
         if r.get("conflict"):
@@ -109,13 +122,11 @@ for r in sorted(rows, key=lambda r: draft.ORDER[r["status"]]):
 
 # --- Export: only when every answer is approved --------------------------------------
 st.subheader("Export")
-pending = [r["id"] for r in rows if decisions.get(r["id"]) != "Approve"]
-if pending:
+final = draft.export(result["customer"], rows, approved)       # the exact approved text, never the live edit box
+if final is None:
+    pending = [r["id"] for r in rows if r["id"] not in approved]
     st.info(f"{len(pending)} answers still need approval: {', '.join(pending)}")
 else:
-    answers = {r["id"]: st.session_state["ans_" + r["id"]] for r in rows}      # the edited, approved text
-    final = "\n\n".join([f"# Response to {result['customer']}"] +
-                        [f"**{r['id']}** {r['text']}\n\n{answers[r['id']]}" for r in rows])
     st.download_button("Download customer response (.md)", final, file_name=f"response_{result['rfp']}.md")
     st.caption("Only the approved answers go out. Conditions and internal notes are not included.")
 

@@ -79,8 +79,9 @@ Then open http://localhost:8501. If the sidebar is hidden on a narrow window, us
    - Pending / Approve / Reject.
 
    Approving saves the answer to the answer library. Reject or Pending withdraws it again.
-5. **Export:** the download button appears only when every answer is approved. The file contains only the
-   approved customer text, never the conditions.
+   Editing an approved answer sets it back to Pending: an approval covers one exact text.
+5. **Export:** the download button appears only when every answer is approved. The file contains exactly the
+   text that was approved, never the conditions.
 6. **Update CRM:** shows the exact JSON to be written. Tick "I have reviewed this update", then click
    **Write to CRM**. An identical second write is skipped.
 
@@ -106,7 +107,18 @@ find the documents a correct answer needs?) and **answer checks** (status, condi
 notes in the answer, conflicts, citations, owner). It also checks the summary agent never invents
 a price. Results are appended to `outputs/eval_history.jsonl`; see `docs/EVAL_RESULTS.md`.
 
-Why it is built this way (decisions, trade-offs, safety, evaluation, limitations): see `DESIGN.md`.
+## Limitations
+
+- **The reviewer picker is not authentication.** Anyone using the UI can pick the manager or legal role.
+  Retrieval is filtered correctly for the role that is picked, so this shows role-aware retrieval, not
+  production access control; in production the role would come from the company's sign-in (SSO).
+- **Citations are checked, not proven.** The code checks that every cited section was actually retrieved
+  and allowed for the role, and flags stale or conflicting sources. It cannot prove that a cited passage
+  supports every sentence of the answer, so a human reviews every answer before it goes out.
+- **The eval is small and self-made.** 30/30 is on three fictional RFPs with labels written for this prototype. It shows the
+  pipeline works and that fixes didn't break anything; it is not a general accuracy number.
+- **Plain text input only.** Real RFPs arrive as PDFs and spreadsheets; the completeness check only
+  catches requirements numbered in one consistent style.
 
 ## Project layout
 

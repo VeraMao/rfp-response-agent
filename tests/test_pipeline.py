@@ -82,5 +82,19 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("3 document sections were hidden", md)
 
 
+class ExportTests(unittest.TestCase):
+    ROWS = [{"id": "1", "text": "SSO?", "answer": "We do."}, {"id": "2", "text": "SLA?", "answer": "99.9%."}]
+
+    def test_export_waits_for_every_approval(self):
+        self.assertIsNone(draft.export("Acme", self.ROWS, {"1": "We do."}))
+
+    def test_export_uses_the_approved_text_not_a_later_edit(self):
+        rows = [dict(r) for r in self.ROWS]
+        rows[0]["answer"] = "We do, and more."                      # changed after approval
+        out = draft.export("Acme", rows, {"1": "We do.", "2": "99.9%."})
+        self.assertIn("We do.", out)
+        self.assertNotIn("and more", out)
+
+
 if __name__ == "__main__":
     unittest.main()
