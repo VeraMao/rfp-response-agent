@@ -1,17 +1,8 @@
 # Roadmap: from steel thread to a realistic prototype
 
-**Status (Oct 31): M1-M5 built; offline tests pass (32). Next: run the eval with the API (M0/M6),
-fix what fails, record scores in docs/EVAL_RESULTS.md, commit.**
-
-Current state (v2 + B, not yet committed):
-- Steps 1-5 pipeline: extract -> retrieve (embeddings, top-3) -> assess (supported /
-  conditional / not_found) -> code checks -> draft for review.
-- Step 6 deal-summary agent with read-only tools get_customer / get_pricing.
-- Step 7 CRM update only after a human types "yes".
-- B: documents carry `last_updated` + `owner` front matter; conflicts flagged by the model,
-  stale sources (> 365 days) flagged by code; `sales-deck-2024.md` is a deliberate stale,
-  conflicting doc.
-- eval.py: per-requirement checks + summary-agent checks.
+**Status (Nov 2): all milestones below are built and committed. 50 offline tests pass; the eval
+scores 30/30 on retrieval recall and 30/30 on answer checks (see docs/EVAL_RESULTS.md).
+This file is kept as the original build plan; for the current design see README.md and DESIGN.md.**
 
 Work through the milestones in order. Each milestone ends with: pytest green, eval score
 reported, README updated, one git commit with the score in the message.

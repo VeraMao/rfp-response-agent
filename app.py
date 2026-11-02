@@ -6,7 +6,7 @@ import json
 
 import streamlit as st
 
-from rfp import audit, config, crm, draft, knowledge, library, permissions, pipeline
+from rfp import audit, config, crm, draft, knowledge, library, llm, permissions, pipeline
 
 st.set_page_config(page_title="RFP Response Agent", layout="wide")
 USERS = permissions.load_users()
@@ -30,6 +30,9 @@ with st.sidebar:
     rfp_name = st.selectbox("RFP", RFPS)
     user_id = st.selectbox("Reviewer", list(USERS), format_func=lambda u: f"{USERS[u]['name']} ({USERS[u]['role']})")
     if st.button("Run agent", type="primary", use_container_width=True):
+        if not llm.has_key():
+            st.error(llm.MISSING_KEY)
+            st.stop()
         for key in [k for k in st.session_state if k.startswith(("ans_", "dec_"))]:
             del st.session_state[key]                       # a new run starts with fresh answers
         with st.spinner("Reading the RFP, searching documents, assessing each requirement..."):

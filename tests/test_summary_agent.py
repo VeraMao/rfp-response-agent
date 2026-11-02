@@ -1,4 +1,5 @@
-"""Summary agent loop with a fake model (no API): bad tool arguments, counts by code, the untrusted-input rule."""
+"""Summary agent loop with a fake model (no API): bad tool arguments, counts by code, the untrusted-input rule,
+and the missing-key message."""
 import json
 import unittest
 from types import SimpleNamespace
@@ -69,6 +70,14 @@ class PromptTests(unittest.TestCase):
     def test_every_prompt_treats_input_as_untrusted(self):
         for prompt in (extract.INSTRUCTIONS, assess.INSTRUCTIONS, summary_agent.INSTRUCTIONS):
             self.assertIn(llm.UNTRUSTED_INPUT_RULE, prompt)
+
+
+class MissingKeyTest(unittest.TestCase):
+    def test_missing_key_gives_one_clear_line(self):
+        with mock.patch.dict("os.environ", {}, clear=True), mock.patch.object(llm, "_client", None):
+            with self.assertRaises(SystemExit) as err:
+                llm.client()
+        self.assertIn("OPENAI_API_KEY", str(err.exception.code))
 
 
 if __name__ == "__main__":
