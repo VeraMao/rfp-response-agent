@@ -38,6 +38,8 @@ INSTRUCTIONS = (
     "like 'the passages'. If status is not_supported, say plainly and politely that we do not currently offer "
     "it. If status is not_found, answer with: 'We will confirm this requirement and follow up.' "
     "Doubts, caveats and things to verify belong in 'conditions', never in 'answer'. "
+    "Never tell the customer that our own report, certification or document is out of date, expired or not "
+    "current: state what it covers (e.g. its period) and leave the doubt for 'conditions'. "
     "'conditions': list EVERY condition, including which plan is required, customer obligations and dates "
     "to verify. If a passage limits something to a plan or customer type (e.g. 'Enterprise customers'), "
     "that is a condition. For not_supported, put any future plan here for the sales rep. "
