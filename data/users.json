@@ -1,0 +1,5 @@
+{
+  "dana": {"name": "Dana Lee", "role": "sales_rep"},
+  "marco": {"name": "Marco Ruiz", "role": "sales_manager"},
+  "priya": {"name": "Priya Shah", "role": "legal"}
+}

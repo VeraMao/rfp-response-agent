@@ -1,0 +1,78 @@
+{
+  "customer": "Meridian Health",
+  "requirements": {
+    "3.1": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "product.md"
+      ]
+    },
+    "3.2": {
+      "status": [
+        "conditional"
+      ],
+      "conditions_must_mention": [
+        "enterprise"
+      ],
+      "answer_must_not_mention": [
+        "standard",
+        "99.5",
+        "99.95",
+        "99.97"
+      ],
+      "conflict": true,
+      "expected_evidence": [
+        "product.md"
+      ]
+    },
+    "3.3": {
+      "status": [
+        "conditional"
+      ],
+      "conditions_must_mention": [
+        "2025"
+      ],
+      "answer_must_not_mention": [],
+      "conflict": null,
+      "expected_evidence": [
+        "security.md"
+      ]
+    },
+    "3.4": {
+      "status": [
+        "conditional"
+      ],
+      "conditions_must_mention": [
+        "enterprise",
+        "project lead",
+        "data export"
+      ],
+      "answer_must_not_mention": [],
+      "conflict": null,
+      "expected_evidence": [
+        "implementation.md"
+      ]
+    },
+    "3.5": {
+      "status": [
+        "not_supported",
+        "not_found"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [
+        "2027",
+        "roadmap",
+        "planned"
+      ],
+      "conflict": null,
+      "expected_evidence": [
+        "roadmap-2027.md"
+      ]
+    }
+  }
+}

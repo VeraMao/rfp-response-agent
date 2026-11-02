@@ -1,0 +1,27 @@
+REQUEST FOR PROPOSAL - Retail Analytics
+Issued by: Lumen Retail, IT Procurement
+Response due: January 10, 2027
+
+1. Background
+Lumen Retail runs 220 stores in Singapore, Malaysia and Australia and wants one analytics platform
+for store and e-commerce data.
+
+2. How to respond
+Answer each item in section 4.
+
+3. Timeline
+Contract signature expected in February 2027.
+
+4. Requirements
+4.1 Native integration with Snowflake.
+4.2 Two-way integration with Salesforce.
+4.3 The web application must meet WCAG 2.1 AA.
+4.4 Mobile apps must work offline in stores with poor connectivity.
+4.5 Customer data must be hosted in the Asia-Pacific region (Singapore preferred).
+4.6 The vendor must guarantee at least 99.95% monthly uptime.
+4.7 The platform must be live within 30 days of contract signature.
+4.8 Our data must never be used to train AI models.
+4.9 We must be able to switch off AI features.
+4.10 Pricing must include unlimited users for a flat fee.
+4.11 Provide a reference customer in the retail industry.
+4.12 We require monthly billing.

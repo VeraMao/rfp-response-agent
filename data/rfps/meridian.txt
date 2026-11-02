@@ -1,0 +1,20 @@
+REQUEST FOR PROPOSAL - Analytics Platform
+Issued by: Meridian Health, Procurement Office
+Response due: December 1, 2026
+
+1. Background
+Meridian Health operates 14 clinics and wants a cloud analytics platform for
+operational reporting. Vendors should answer each requirement in section 3.
+
+2. Instructions
+Please state for each requirement whether you meet it, and provide supporting detail.
+
+3. Requirements
+3.1 The platform must support single sign-on (SSO) with Okta.
+3.2 The vendor must guarantee at least 99.9% monthly uptime.
+3.3 The vendor must hold a current SOC 2 Type II report.
+3.4 Implementation must be completed within 60 days of contract signature.
+3.5 The vendor must be HIPAA compliant and willing to sign a Business Associate Agreement (BAA).
+
+4. Contact
+Questions: procurement@meridianhealth.example

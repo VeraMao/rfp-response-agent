@@ -1,0 +1,25 @@
+REQUEST FOR PROPOSAL - Business Intelligence Platform
+Issued by: Harbor Bank, Vendor Management Office
+Response due: December 15, 2026
+
+1. About Harbor Bank
+Harbor Bank is a regional bank with operations in Germany and the Netherlands. We are selecting a
+business intelligence platform for 300 analysts. Respond to every requirement below.
+
+2. Requirements
+R-01 The platform must support SAML-based single sign-on with Azure AD.
+R-02 Administrators must be able to enforce multi-factor authentication for all users.
+R-03 All customer data, including backups, must be stored and processed only in the European Union.
+R-04 The vendor must be PCI DSS certified.
+R-05 The platform must support customer-managed encryption keys.
+R-06 Recovery point objective must be 1 hour or less, and recovery time objective 4 hours or less.
+R-07 The vendor must have an annual third-party penetration test and share the results with us.
+R-08 The vendor must accept unlimited liability for data breaches.
+R-09 The vendor must provide 24/7 support with a response to critical issues within 1 hour.
+R-10 Audit logs must be retained for at least 7 years.
+R-11 All customer data must be deleted within 60 days after the contract ends.
+R-12 The vendor must hold a current SOC 2 Type II report.
+R-13 The vendor must sign a GDPR Data Processing Agreement.
+
+3. Contact
+vendor.management@harborbank.example

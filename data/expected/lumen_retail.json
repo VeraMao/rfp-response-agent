@@ -1,0 +1,152 @@
+{
+  "customer": "Lumen Retail",
+  "requirements": {
+    "4.1": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "integrations.md"
+      ]
+    },
+    "4.2": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "integrations.md"
+      ]
+    },
+    "4.3": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "accessibility.md"
+      ]
+    },
+    "4.4": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [
+        "2027",
+        "roadmap",
+        "planned"
+      ],
+      "conflict": null,
+      "expected_evidence": [
+        "mobile.md"
+      ]
+    },
+    "4.5": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [
+        "2027",
+        "roadmap",
+        "planned",
+        "singapore region"
+      ],
+      "conflict": null,
+      "expected_evidence": [
+        "data-residency.md"
+      ]
+    },
+    "4.6": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [
+        "99.97",
+        "all plans"
+      ],
+      "conflict": null,
+      "expected_evidence": [
+        "product.md"
+      ]
+    },
+    "4.7": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": null,
+      "expected_evidence": [
+        "implementation.md"
+      ]
+    },
+    "4.8": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "ai-features.md"
+      ]
+    },
+    "4.9": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "ai-features.md"
+      ]
+    },
+    "4.10": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [
+        "unlimited users on"
+      ],
+      "conflict": null,
+      "expected_evidence": [
+        "pricing-public.md"
+      ]
+    },
+    "4.11": {
+      "status": [
+        "not_supported",
+        "not_found"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": null,
+      "expected_evidence": [
+        "case-studies.md"
+      ]
+    },
+    "4.12": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "pricing-public.md"
+      ]
+    }
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "customer": "Harbor Bank",
+  "requirements": {
+    "R-01": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "product.md"
+      ]
+    },
+    "R-02": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "identity.md"
+      ]
+    },
+    "R-03": {
+      "status": [
+        "conditional"
+      ],
+      "conditions_must_mention": [
+        "enterprise"
+      ],
+      "answer_must_not_mention": [],
+      "conflict": null,
+      "expected_evidence": [
+        "data-residency.md"
+      ]
+    },
+    "R-04": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "compliance.md"
+      ]
+    },
+    "R-05": {
+      "status": [
+        "conditional"
+      ],
+      "conditions_must_mention": [
+        "enterprise"
+      ],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "security-advanced.md"
+      ]
+    },
+    "R-06": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "disaster-recovery.md"
+      ]
+    },
+    "R-07": {
+      "status": [
+        "conditional"
+      ],
+      "conditions_must_mention": [
+        "nda"
+      ],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "security-testing.md"
+      ]
+    },
+    "R-08": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": null,
+      "expected_evidence": [
+        "legal-msa.md"
+      ]
+    },
+    "R-09": {
+      "status": [
+        "conditional"
+      ],
+      "conditions_must_mention": [
+        "enterprise"
+      ],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "support.md"
+      ]
+    },
+    "R-10": {
+      "status": [
+        "not_supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "identity.md"
+      ]
+    },
+    "R-11": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "data-retention.md"
+      ]
+    },
+    "R-12": {
+      "status": [
+        "conditional"
+      ],
+      "conditions_must_mention": [
+        "2025"
+      ],
+      "answer_must_not_mention": [],
+      "conflict": null,
+      "expected_evidence": [
+        "security.md"
+      ]
+    },
+    "R-13": {
+      "status": [
+        "supported"
+      ],
+      "conditions_must_mention": [],
+      "answer_must_not_mention": [],
+      "conflict": false,
+      "expected_evidence": [
+        "compliance.md"
+      ]
+    }
+  }
+}

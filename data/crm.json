@@ -1,0 +1,17 @@
+{
+  "Meridian Health": {
+    "account_id": "ACC-0412", "relationship": "existing customer", "current_plan": "Standard",
+    "users": 40, "clinics_live": 3, "account_owner": "Dana Lee", "renewal_date": "2027-03-31",
+    "notes": "Pilot on Standard at 3 of 14 clinics. This RFP covers all 14 clinics."
+  },
+  "Harbor Bank": {
+    "account_id": "ACC-0533", "relationship": "prospect", "current_plan": null,
+    "users_in_scope": 300, "account_owner": "Marco Ruiz", "renewal_date": null,
+    "notes": "Regulated bank in Germany and the Netherlands. Security review is the main hurdle."
+  },
+  "Lumen Retail": {
+    "account_id": "ACC-0601", "relationship": "prospect", "current_plan": null,
+    "users_in_scope": null, "account_owner": "Dana Lee", "renewal_date": null,
+    "notes": "Stores in Singapore, Malaysia and Australia."
+  }
+}

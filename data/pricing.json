@@ -1,0 +1,8 @@
+{
+  "items": {
+    "Standard": {"price_usd_per_user_per_month": 30},
+    "Enterprise": {"price_usd_per_user_per_month": 55, "minimum_users": 50},
+    "Fast-track": {"one_time_fee_usd": 15000, "available_on": "Enterprise only"}
+  },
+  "discount_limits_pct": {"sales_rep": 10, "sales_manager": 25}
+}
