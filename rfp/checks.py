@@ -4,6 +4,13 @@ import re
 from rfp import config, knowledge
 
 
+def failed_assessment(error):
+    """What a requirement becomes when its model call fails: needs review, never a guess."""
+    return {"status": "not_found", "answer": "We will confirm this requirement and follow up.",
+            "conditions": f"The automatic assessment failed ({type(error).__name__}). Review this requirement manually.",
+            "citations": [], "conflict": None, "owner": None}
+
+
 def check(result, evidence, plans, today=None):
     """Fix or flag the model's assessment of one requirement. `evidence` = [(score, chunk), ...]."""
     by_id = {c["id"]: c for _, c in evidence}

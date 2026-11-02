@@ -52,6 +52,19 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("approved before", row["library_note"])
         self.assertIsNone(fake_assess.hints[0])
 
+    def test_a_failed_model_call_fails_closed_for_that_requirement_only(self):
+        def flaky_assess(req, evidence, hint=None, today=None):
+            if req["id"] == "2":
+                raise ValueError("model returned no JSON")
+            return fake_assess(req, evidence, hint, today)
+        reqs = [{"id": "1", "text": "Single sign-on with Okta"}, {"id": "2", "text": "Monthly billing"}]
+        with mock.patch("rfp.assess.assess", flaky_assess):
+            rows = pipeline.assess_requirements(reqs, self.index, USER, log=lambda *_: None)
+        self.assertEqual([r["status"] for r in rows], ["supported", "not_found"])
+        self.assertIn("assessment failed (ValueError)", rows[1]["conditions"])
+        self.assertEqual(rows[1]["citations"], [])
+        self.assertTrue(rows[1]["owner"])                                 # a person must look at it
+
     def test_rows_render_in_the_draft(self):
         rows = self.run_one("Single sign-on with Okta")
         md = draft.build("Meridian Health", rows, USER, hidden=3)

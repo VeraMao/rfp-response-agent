@@ -40,7 +40,8 @@ Rules:
 - Do not compute a total price unless every input (such as the number of users in scope) is known;
   if one is missing, say what is missing.
 - Mark each fact's source in brackets: [Assessment 3.2], [CRM], [Pricing].
-- Internal note for our team, not text for the customer. Under 250 words."""
+- Internal note for our team, not text for the customer. Under 250 words.
+- """ + llm.UNTRUSTED_INPUT_RULE
 
 
 def run(rfp_header, customer, rows, user, log=print):
@@ -61,11 +62,12 @@ def run(rfp_header, customer, rows, user, log=print):
             return resp.output_text, calls_made
         items += resp.output
         for c in calls:
-            args = json.loads(c.arguments)
             func = registry.get(c.name)
             try:
+                args = json.loads(c.arguments)
                 result = func(**args) if func else {"error": f"Unknown tool: {c.name}"}
-            except TypeError as exc:                                     # wrong arguments -> tell the model
+            except (json.JSONDecodeError, TypeError) as exc:            # malformed or wrong arguments -> tell the model
+                args = {}
                 result = {"error": f"Bad arguments for {c.name}: {exc}"}
             log(f"   [agent step {step}] {c.name}({args}) -> {result}")
             calls_made.append(f"{c.name}({', '.join(str(v) for v in args.values())})")

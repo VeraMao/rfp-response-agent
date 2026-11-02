@@ -24,7 +24,12 @@ def assess_requirements(requirements, index, user, use_library=True, log=print, 
             ok, note = library.usable(match[1], chunks_by_id, role)
             if ok:
                 hint, reused = library.hint(match[1]), match[1]["id"]
-        result = checks.check(assess.assess(req, evidence, hint, today), evidence, plans, today)
+        try:
+            assessed = assess.assess(req, evidence, hint, today)
+        except Exception as exc:          # fail closed: one bad call must not stop the RFP or pass silently
+            log(f"[{req['id']}] assessment failed: {type(exc).__name__}: {exc}")
+            assessed = checks.failed_assessment(exc)
+        result = checks.check(assessed, evidence, plans, today)
         result.update(searched=[c["id"] for _, c in evidence], reused_from=reused, library_note=note)
         log(f"[{req['id']}] {result['status']:<13} {result['citations']}"
             f"{'  (reused ' + reused + ')' if reused else ''}")

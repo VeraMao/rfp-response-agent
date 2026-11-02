@@ -48,7 +48,8 @@ INSTRUCTIONS = (
     "Otherwise 'conflict' is null. "
     "'owner': the team that should confirm the answer before it is sent (null only if fully supported). "
     "If a previously approved answer is given, reuse its wording only where today's passages still support it. "
-    "Cite the passage ids you used (not the approved-answer id)."
+    "Cite the passage ids you used (not the approved-answer id). "
+    + llm.UNTRUSTED_INPUT_RULE
 )
 
 
