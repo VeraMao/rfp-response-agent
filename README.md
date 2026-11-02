@@ -6,19 +6,18 @@ the CRM, without a human approving it.
 
 ## How it works
 
-```
-RFP text
-  -> 1. Extract requirements     structured outputs: customer + numbered requirements
-  -> 2. Retrieve evidence         embeddings (or hybrid embeddings + keywords), top-k per requirement,
-                                  only from documents the user is allowed to see
-  -> 3. Assess each requirement   supported / conditional / not_supported / not_found
-                                  + customer-facing answer, conditions, citations, conflict, owner
-  -> 4. Code checks               invented citations dropped; no evidence -> needs review; stale source
-                                  (> 1 year) or conflicting sources -> never "supported"; plan
-                                  conditions enforced; every flag gets an owner
-  -> 5. Draft for review          riskiest items first
-  -> 6. Deal summary agent        decides whether to look up CRM / pricing (read-only tools)
-  -> 7. Human approval            approved answers go to the answer library; CRM write needs a confirm
+```text
+RFP text (untrusted: written by the customer)
+ 1 Extract        model, strict JSON -> customer + requirements with the RFP's own ids
+   + check        code: every line numbered in the same style must be in the list; missing ones are
+                  recovered from the text and flagged
+ 2 Retrieve       embeddings, top 4 sections per requirement, only from documents the user's role may see
+ 3 Assess         one model call per requirement -> status, answer, conditions, citations, conflict, owner
+ 4 Code checks    rfp/checks.py: the model assesses, the code validates
+ 5 Draft          markdown / UI cards, riskiest first
+ 6 Deal summary   the only agent: decides whether to look up the CRM and pricing (read-only tools, max 5 rounds)
+ 7 Human          edit, approve or reject each answer; export only when all are approved;
+                  approved answers -> answer library; CRM write after an explicit confirmation; audit log
 ```
 
 Steps 1-5 are a fixed pipeline: they are the same for every requirement. Step 6 is an agent
@@ -52,6 +51,46 @@ cp .env.example .env                                   # then put your OpenAI ke
 .venv/bin/streamlit run app.py                         # review UI in the browser
 ```
 
+### Review UI
+
+```bash
+.venv/bin/streamlit run app.py
+```
+
+Then open http://localhost:8501. If the sidebar is hidden on a narrow window, use the `>>` arrow at the top left.
+
+1. In the sidebar, pick an **RFP** (`meridian`, `harbor_bank` or `lumen_retail`) and a **Reviewer**:
+   - Dana Lee (sales_rep)
+   - Marco Ruiz (sales_manager)
+   - Priya Shah (legal)
+
+   The reviewer's role decides which documents are searched and the discount limit.
+2. Click **Run agent**. It takes about 15-30 seconds (Meridian, 5 requirements: ~16 s; Harbor Bank, 13: ~31 s).
+3. At the top of the result:
+   - the count per status;
+   - how many document sections were hidden by the reviewer's permissions;
+   - the **Deal summary**, which lists what the agent looked up.
+4. One card per requirement, riskiest first. Each card has:
+   - the customer answer, which you can edit;
+   - the internal conditions;
+   - any source conflict;
+   - **Evidence**: the cited sections, each with its date and owner;
+   - who should confirm it;
+   - Pending / Approve / Reject.
+
+   Approving saves the answer to the answer library. Reject or Pending withdraws it again.
+5. **Export:** the download button appears only when every answer is approved. The file contains only the
+   approved customer text, never the conditions.
+6. **Update CRM:** shows the exact JSON to be written. Tick "I have reviewed this update", then click
+   **Write to CRM**. An identical second write is skipped.
+
+The UI writes to:
+- `data/answer_library.json`, on approvals;
+- `outputs/audit.jsonl`;
+- `outputs/crm_updates.json`.
+
+After a demo, restore the library with `git checkout -- data/answer_library.json`.
+
 ## Tests and evaluation
 
 ```bash
@@ -66,6 +105,8 @@ The eval reports two scores so failures are blamed on the right step: **retrieva
 find the documents a correct answer needs?) and **answer checks** (status, conditions, no internal
 notes in the answer, conflicts, citations, owner). It also checks the summary agent never invents
 a price. Results are appended to `outputs/eval_history.jsonl`; see `docs/EVAL_RESULTS.md`.
+
+Why it is built this way (decisions, trade-offs, safety, evaluation, limitations): see `DESIGN.md`.
 
 ## Project layout
 

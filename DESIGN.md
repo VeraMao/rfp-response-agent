@@ -1,5 +1,8 @@
 # Design: RFP Response Agent
 
+Why the prototype is built the way it is: the decisions, what can go wrong, how it is evaluated and
+what is missing. What it does, how to run it and the project layout are in README.md.
+
 ## 1. Problem
 
 Northwind Analytics sells a B2B analytics platform. Answering a prospect's RFP takes sales, product,
@@ -26,19 +29,8 @@ Support confirm the flagged items. A sales manager (Marco) and a legal user (Pri
 
 ## 2. Architecture
 
-```text
-RFP text (untrusted: written by the customer)
- 1 Extract        model, strict JSON -> customer + requirements with the RFP's own ids
-   + check        code: every line numbered in the same style must be in the list; missing ones are
-                  recovered from the text and flagged
- 2 Retrieve       embeddings, top 4 sections per requirement, only from documents the user's role may see
- 3 Assess         one model call per requirement -> status, answer, conditions, citations, conflict, owner
- 4 Code checks    rfp/checks.py: the model assesses, the code validates
- 5 Draft          markdown / UI cards, riskiest first
- 6 Deal summary   the only agent: decides whether to look up the CRM and pricing (read-only tools, max 5 rounds)
- 7 Human          edit, approve or reject each answer; export only when all are approved;
-                  approved answers -> answer library; CRM write after an explicit confirmation; audit log
-```
+The seven steps are listed in README.md ("How it works"). This section covers what each step can get
+wrong, and what the code does about it.
 
 One function, `pipeline.run`, sits behind the CLI (`rfp_agent.py`), the review UI (`app.py`) and the eval
 (`eval.py`), so the eval measures the product's real code path.
@@ -120,11 +112,10 @@ agent's step limit.
 
 ## 5. Evaluation
 
-**Data.** I wrote three RFPs with 30 requirements in total:
-
-- Meridian Health: healthcare, 5 requirements.
-- Harbor Bank: financial services in the EU, 13 requirements.
-- Lumen Retail: retail in Asia-Pacific, 12 requirements.
+**Data.** I wrote the 3 RFPs (30 requirements) and their labels myself; README.md lists them, along with the
+traps planted in the documents: a stale sales deck with a conflicting uptime figure, an old whitepaper, an
+internal roadmap, and restricted documents. The traps are there so the eval tests the rules that matter: never
+promise the roadmap, prefer the newer source, never leak restricted text.
 
 Each requirement has a label in `data/expected/` with:
 
@@ -133,14 +124,6 @@ Each requirement has a label in `data/expected/` with:
 - words the customer answer must never contain (e.g. a roadmap year);
 - whether a source conflict exists;
 - the documents a correct answer needs.
-
-The knowledge base deliberately contains traps:
-
-- a 2024 sales deck promising 99.95% uptime on all plans (the current figure is 99.9%, Enterprise only);
-- a 2023 security whitepaper;
-- a 2024 FAQ promising unlimited users;
-- an internal 2027 roadmap;
-- two restricted documents.
 
 **Scores.**
 
