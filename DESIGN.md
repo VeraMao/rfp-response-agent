@@ -145,10 +145,11 @@ Each requirement has a label in `data/expected/` with:
 
 Across all of these runs, the agent never answered "supported" where the label said otherwise.
 Three runs were not enough to prove stability, though. A live run in the review UI on 2026-11-02 judged
-Meridian 3.3 (SOC 2) "not supported" by leaning on the 2023 whitepaper, although the eval had passed it 90/90.
+Meridian 3.3 (SOC 2) "not supported" by leaning on the 2023 whitepaper, although it had been correct in every
+eval run (the suite's 90/90 is 30 items × 3 runs, so 3.3 itself was 3/3 there).
 The error went in the safe direction: the stale source was flagged and the item was routed to Security.
-I then ran 3.3 another 30 times (6 full pipeline runs and 24 direct calls) and all 30 were correct, so it is a
-rare flip (about 1 in 40 runs since the prompt rule was added).
+I then ran 3.3 another 30 times (6 full pipeline runs and 24 direct calls) and all 30 were correct. Since the
+prompt rule was added, 3.3 has 40 recorded runs: 39 correct (9 eval runs + 30 re-runs), 1 wrong.
 
 I did not add a code rule for it. The obvious rule, "a 'no' that cites a source older than a year needs
 review", would also break three correct answers (Lumen Retail 4.5, 4.6 and 4.10), which cite the old document
@@ -167,7 +168,7 @@ rule:
 
 **Other evidence.**
 
-- 49 offline unit tests use a fake model and fake embeddings, with no API calls.
+- 50 offline unit tests use a fake model and fake embeddings, with no API calls.
 - Mutation checks: breaking the citation filter, the conflict rule, permissions, the library withdrawal,
   the CRM duplicate check, fail-closed or the completeness check makes a test fail in each case.
 - A separate 12-item stress RFP (unscored): two injection attempts were ignored and restricted discounts
