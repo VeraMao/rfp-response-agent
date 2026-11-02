@@ -13,7 +13,7 @@ import argparse
 import json
 from datetime import datetime
 
-from rfp import config, crm, extract, permissions, pipeline, scoring, summary_agent
+from rfp import config, crm, permissions, pipeline, scoring, summary_agent
 
 
 def main():
@@ -40,14 +40,16 @@ def main():
         report[name] = {}
         for n in range(1, args.runs + 1):
             print(f"\n=== {name}  run {n}  ({user['name']}, {user['role']}, retrieval={args.mode}) ===")
-            extracted = extract.extract(rfp_text)
-            got = {r["id"]: r for r in extracted["requirements"]}
+            customer, requirements, recovered = pipeline.extract_requirements(rfp_text, log=lambda *_: None)
+            got = {r["id"]: r for r in requirements}
+            if recovered:
+                print(f"  EXTRACTION missed {sorted(recovered)}; recovered by the code check")
             missing = sorted(set(exp_all["requirements"]) - set(got))
             if missing:
-                print(f"  EXTRACTION missed: {missing}")
+                print(f"  EXTRACTION missed (not recovered): {missing}")
             reqs = [got[i] for i in exp_all["requirements"] if i in got]
             rows = {r["id"]: r for r in pipeline.assess_requirements(reqs, index, user, use_library=False,
-                                                                    log=lambda *_: None)}
+                                                                    log=lambda *_: None, recovered=recovered)}
             for rid, exp in exp_all["requirements"].items():
                 if rid not in rows:
                     fails, hit = ["not extracted"], False
@@ -62,7 +64,7 @@ def main():
                       f"{'; '.join(fails)}")
             if not args.no_summary:
                 header = "\n".join(rfp_text.splitlines()[:4])
-                customer = extracted["customer"] or exp_all["customer"]
+                customer = customer or exp_all["customer"]
                 summary, calls = summary_agent.run(header, customer, list(rows.values()), user, log=lambda *_: None)
                 fails = scoring.score_summary(summary, calls, allowed_numbers)
                 totals["summary"][0] += not fails

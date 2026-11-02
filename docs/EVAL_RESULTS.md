@@ -12,3 +12,4 @@ Fill in after each change. Command: `.venv/bin/python eval.py` (add `--runs 3` f
 | Nov 1 | stability check, same code (`--runs 3`, with summary agent) | embed | 90/90 | 90/90 | 9/9 | no flaky items, no invented prices |
 | Nov 1 | answer library follows the latest decision; identical CRM write skipped | embed | 30/30 | 30/30 | not run | write paths are not in the eval; covered by 3 new unit tests + a headless UI run |
 | Nov 1 | untrusted-input rule in all prompts; failed model call -> needs review for that item | embed | 30/30 | 30/30 | 3/3 | separate 12-item stress RFP (own, unscored): two injection attempts ignored, restricted discounts not revealed |
+| Nov 1 | extraction completeness check in code (skipped requirements recovered + flagged) | embed | 30/30 | 30/30 | not run | no false "missed" alarms; live Meridian run with 3.5 forced missing: recovered, not_supported, flagged |

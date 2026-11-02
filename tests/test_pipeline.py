@@ -65,6 +65,16 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(rows[1]["citations"], [])
         self.assertTrue(rows[1]["owner"])                                 # a person must look at it
 
+    def test_a_requirement_the_model_skipped_is_recovered_and_flagged(self):
+        rfp_text = "3.1 Single sign-on with Okta.\n3.2 Monthly billing.\n"
+        skipped = {"customer": "Meridian Health", "requirements": [{"id": "3.1", "text": "Single sign-on with Okta."}]}
+        with mock.patch("rfp.extract.extract", lambda text: skipped), mock.patch("rfp.assess.assess", fake_assess):
+            customer, reqs, recovered = pipeline.extract_requirements(rfp_text, log=lambda *_: None)
+            rows = pipeline.assess_requirements(reqs, self.index, USER, log=lambda *_: None, recovered=recovered)
+        self.assertEqual(recovered, {"3.2"})
+        self.assertEqual([r["status"] for r in rows], ["supported", "conditional"])
+        self.assertIn("Missed by the extraction step", rows[1]["conditions"])
+
     def test_rows_render_in_the_draft(self):
         rows = self.run_one("Single sign-on with Okta")
         md = draft.build("Meridian Health", rows, USER, hidden=3)

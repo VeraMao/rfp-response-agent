@@ -11,6 +11,17 @@ def failed_assessment(error):
             "citations": [], "conflict": None, "owner": None}
 
 
+def flag_recovered(result):
+    """A requirement the extraction step missed was recovered from one line of the RFP, so its wording
+    may be cut short: flag it, and never let it be a plain "supported"."""
+    note = "Missed by the extraction step and recovered from the RFP text; check the full wording."
+    result["conditions"] = f"{note} {result['conditions'] or ''}".strip()
+    if result["status"] == "supported":
+        result["status"] = "conditional"
+    result["owner"] = result["owner"] or "Unassigned (pick a reviewer)"
+    return result
+
+
 def check(result, evidence, plans, today=None):
     """Fix or flag the model's assessment of one requirement. `evidence` = [(score, chunk), ...]."""
     by_id = {c["id"]: c for _, c in evidence}

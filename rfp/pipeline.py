@@ -10,7 +10,16 @@ def build_index():
     return retrieve.Index(knowledge.load_chunks())
 
 
-def assess_requirements(requirements, index, user, use_library=True, log=print, today=None):
+def extract_requirements(rfp_text, log=print):
+    """Step 1 plus a completeness check in code: (customer, requirements, ids recovered by code)."""
+    extracted = extract.extract(rfp_text)
+    missing = extract.find_missing(rfp_text, extracted["requirements"])
+    if missing:
+        log(f"Step 1: extraction missed {[m['id'] for m in missing]}; recovered from the RFP text")
+    return extracted["customer"], extracted["requirements"] + missing, {m["id"] for m in missing}
+
+
+def assess_requirements(requirements, index, user, use_library=True, log=print, today=None, recovered=()):
     role = user["role"]
     plans = knowledge.plan_names(permissions.visible(index.chunks, role))
     entries = library.load() if use_library else []
@@ -30,6 +39,8 @@ def assess_requirements(requirements, index, user, use_library=True, log=print, 
             log(f"[{req['id']}] assessment failed: {type(exc).__name__}: {exc}")
             assessed = checks.failed_assessment(exc)
         result = checks.check(assessed, evidence, plans, today)
+        if req["id"] in recovered:
+            result = checks.flag_recovered(result)
         result.update(searched=[c["id"] for _, c in evidence], reused_from=reused, library_note=note)
         log(f"[{req['id']}] {result['status']:<13} {result['citations']}"
             f"{'  (reused ' + reused + ')' if reused else ''}")
@@ -40,11 +51,11 @@ def assess_requirements(requirements, index, user, use_library=True, log=print, 
 def run(rfp_name, user_id, with_summary=True, use_library=True, index=None, log=print):
     rfp_text = (config.RFPS / f"{rfp_name}.txt").read_text()
     user = permissions.get_user(user_id)
-    extracted = extract.extract(rfp_text)
-    customer = extracted["customer"] or rfp_name
-    log(f"Step 1: {customer}: {len(extracted['requirements'])} requirements")
+    customer, requirements, recovered = extract_requirements(rfp_text, log)
+    customer = customer or rfp_name
+    log(f"Step 1: {customer}: {len(requirements)} requirements")
     index = index or build_index()
-    rows = assess_requirements(extracted["requirements"], index, user, use_library, log)
+    rows = assess_requirements(requirements, index, user, use_library, log, recovered=recovered)
     summary, calls = None, []
     if with_summary:
         log("Step 6: deal summary agent")
